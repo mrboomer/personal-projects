@@ -10,3 +10,17 @@ For example:
 @import './variables/components';
 @import './themes/default';
 */
+
+// Bulma
+$purple: #52489C;
+$blue: #4062BB;
+$cyan: #59C3C3;
+$gray: #EBEBEB;
+$red: #F45B69;
+
+$primary: $purple;
+$info: $blue;
+$danger: $red;
+$text: #666;;
+
+@import '../../node_modules/bulma/bulma';

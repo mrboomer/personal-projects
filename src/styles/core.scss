@@ -7,15 +7,26 @@ html {
   box-sizing: border-box;
 }
 
-html,
+html {
+  height: 100%;
+}
+
 body {
+  height: 100%;
   margin: 0;
   padding: 0;
-  height: 100%;
 }
 
 *,
 *:before,
 *:after {
   box-sizing: inherit;
+}
+
+#root {
+  height: 100%;
+
+  & > div {
+    height: 100%;
+  }
 }

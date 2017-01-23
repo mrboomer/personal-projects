@@ -1,3 +1,13 @@
-.core-layout__viewport {
-  padding-top: 4rem;
+.projects-root {
+  height: 100%;
+}
+
+main {
+  position: relative;
+  min-height: 100%;
+  margin: 0 auto -182px;
+}
+
+.push {
+  height: 182px;
 }
