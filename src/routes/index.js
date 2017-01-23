@@ -7,7 +7,7 @@ import FirebaseChatRoute from './FirebaseChat'
     PlainRoute objects to build route definitions.   */
 
 export const createRoutes = (store) => ({
-  path        : '/',
+  path        : '/projects/',
   component   : CoreLayout,
   indexRoute  : Overview,
   childRoutes : [

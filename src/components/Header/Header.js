@@ -20,10 +20,10 @@ export const Header = (props) =>
             <span />
           </span>
           <div className='nav-right nav-menu'>
-            <IndexLink to='/' className='nav-item' activeClassName='is-active'>
+            <IndexLink to='/projects/' className='nav-item' activeClassName='is-active'>
               Projects
             </IndexLink>
-            <a className='nav-item' href='https://daniel.escobedo.io/blog'>
+            <a className='nav-item' href='/blog/'>
               Blog
             </a>
             <span className='nav-item'>
@@ -52,8 +52,8 @@ export const Header = (props) =>
       <div className='container'>
         <nav className='tabs is-boxed'>
           <ul>
-            <NavLink to='/'>Overview</NavLink>
-            <NavLink to='/firebase-chat'>Firebase Chat</NavLink>
+            <NavLink to='/projects/'>Overview</NavLink>
+            <NavLink to='/projects/firebase-chat/'>Firebase Chat</NavLink>
           </ul>
         </nav>
       </div>
