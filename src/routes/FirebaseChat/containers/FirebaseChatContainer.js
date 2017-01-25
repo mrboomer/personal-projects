@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { handleChange, handleKeyDown, handleClick } from '../modules/firebase-chat'
+import { addUser, handleChange, handleKeyDown, handleClick } from '../modules/firebase-chat'
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -13,6 +13,7 @@ import FirebaseChat from '../components/FirebaseChat'
     implementing our wrapper around increment; the component doesn't care   */
 
 const mapDispatchToProps = {
+  addUser : (user) => addUser(user),
   handleChange : (e) => handleChange(e.target.value),
   handleKeyDown : (e) => handleKeyDown(e.key),
   handleClick : () => handleClick()

@@ -1,6 +1,7 @@
 // ------------------------------------
 // Constants
 // ------------------------------------
+export const ADD_USER = 'ADD_USER'
 export const HANDLE_CHANGE = 'HANDLE_CHANGE'
 export const HANDLE_KEYDOWN = 'HANDLE_KEYDOWN'
 export const HANDLE_CLICK = 'HANDLE_CLICK'
@@ -8,6 +9,13 @@ export const HANDLE_CLICK = 'HANDLE_CLICK'
 // ------------------------------------
 // Actions
 // ------------------------------------
+
+export const addUser = (user) => {
+  return {
+    type: ADD_USER,
+    user
+  }
+}
 
 export const handleChange = (message) => {
   return {
@@ -39,28 +47,46 @@ export const actions = {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  [ADD_USER]: (state, action) => {
+    return {
+      user: action.user,
+      message: state.message,
+      messages: state.messages
+    }
+  },
   [HANDLE_CHANGE]: (state, action) => {
     return {
-      messages: state.messages,
-      message: action.message
+      user: state.user,
+      message: action.message,
+      messages: state.messages
     }
   },
   [HANDLE_KEYDOWN]: (state, action) => {
     if (action.key === 'Enter' && state.message) {
-      let messages = [...state.messages, state.message]
+      const messages = [...state.messages, {
+        user: state.user,
+        text: state.message,
+        time: new Date()
+      }]
       return {
-        messages,
-        message: ''
+        user: state.user,
+        message: '',
+        messages
       }
     }
     return state
   },
   [HANDLE_CLICK]: (state, action) => {
     if (state.message) {
-      let messages = [...state.messages, state.message]
+      const messages = [...state.messages, {
+        user: state.user,
+        text: state.message,
+        time: new Date()
+      }]
       return {
-        messages,
-        message: ''
+        user: state.user,
+        message: '',
+        messages
       }
     }
     return state
@@ -71,8 +97,9 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  messages: [],
-  message: ''
+  user: '',
+  message: '',
+  messages: []
 }
 export default function testReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
