@@ -22,7 +22,7 @@ const Message = props => {
   }
 
   const date = `${mm}/${dd}/${yyyy}`
-  const time = `${hh}:${m} ${suffix}`
+  const time = `${hh}:${m}${suffix}`
 
   return (
     <div className='message'>
