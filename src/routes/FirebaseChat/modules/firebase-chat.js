@@ -41,7 +41,6 @@ export const checkAuthentication = (fireRef) => {
 export const authenticateFirebase = (fireRef) => {
   return (dispatch, getState) => {
     fireRef.auth().signInAnonymously().then(firebase => {
-      console.log('redux.authenticateFirebase:', firebase)
       let firebaseId = firebase.uid
       return dispatch({
         type: AUTHENTICATE_FIREBASE,
