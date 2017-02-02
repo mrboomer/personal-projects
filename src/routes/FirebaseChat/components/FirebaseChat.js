@@ -4,11 +4,28 @@ import './FirebaseChat.scss'
 import Messages from './Messages'
 
 export default class FirebaseChat extends Component {
+  componentWillMount () {
+    this.props.checkAuthentication()
+  }
+
   componentDidMount () {
     let user = this.props.chat.user ? this.props.chat.user : prompt('What is your name?')
     user = user === null ? `user${Math.floor(Math.random() * 9000) + 1000}` : user
     this.props.addUser(user)
     this.messageInput.focus()
+  }
+
+  shouldComponentUpdate (nextProps) {
+    if (!this.props.chat.isAuthenticated && !nextProps.chat.isAuthenticated) {
+      return false
+    }
+    return true
+  }
+
+  componentWillUpdate (nextProps) {
+    if (!this.props.chat.isAuthenticated && !nextProps.chat.isAuthenticated) {
+      this.props.authenticateFirebase()
+    }
   }
 
   render () {
@@ -41,6 +58,8 @@ export default class FirebaseChat extends Component {
 
 FirebaseChat.propTypes = {
   chat : PropTypes.object.isRequired,
+  checkAuthentication: PropTypes.func.isRequired,
+  authenticateFirebase: PropTypes.func.isRequired,
   addUser: PropTypes.func.isRequired,
   handleChange : PropTypes.func.isRequired,
   handleKeyDown : PropTypes.func.isRequired,

@@ -5,10 +5,56 @@ export const ADD_USER = 'ADD_USER'
 export const HANDLE_CHANGE = 'HANDLE_CHANGE'
 export const HANDLE_KEYDOWN = 'HANDLE_KEYDOWN'
 export const HANDLE_CLICK = 'HANDLE_CLICK'
+export const IS_AUTHENTICATED = 'IS_AUTHENTICATED'
+export const AUTHENTICATE_FIREBASE = 'AUTHENTICATE_FIREBASE'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
+
+export const checkAuthentication = (fireRef) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve) => {
+      fireRef.auth().onAuthStateChanged(firebase => {
+        let firebaseId = firebase.uid
+        if (firebaseId) {
+          // Firebase Authenticated
+          dispatch({
+            type: IS_AUTHENTICATED,
+            isAuthenticated: true,
+            firebaseId
+          })
+          resolve()
+        } else {
+          dispatch({
+            type: IS_AUTHENTICATED,
+            isAuthenticated: false,
+            firebaseId: null
+          })
+          resolve()
+        }
+      })
+    })
+  }
+}
+
+export const authenticateFirebase = (fireRef) => {
+  return (dispatch, getState) => {
+    fireRef.auth().signInAnonymously().then(firebase => {
+      console.log('redux.authenticateFirebase:', firebase)
+      let firebaseId = firebase.uid
+      return dispatch({
+        type: AUTHENTICATE_FIREBASE,
+        firebaseId
+      })
+    }).catch(() => {
+      return dispatch({
+        type: AUTHENTICATE_FIREBASE,
+        firebaseId: null
+      })
+    })
+  }
+}
 
 export const addUser = (user) => {
   return {
@@ -47,15 +93,40 @@ export const actions = {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  [IS_AUTHENTICATED]: (state, action) => {
+    return {
+      isAuthenticated: action.isAuthenticated,
+      firebaseId: action.firebaseId,
+      user: state.user,
+      userId: action.userId,
+      message: state.message,
+      messages: state.messages
+    }
+  },
+  [AUTHENTICATE_FIREBASE]: (state, action) => {
+    return {
+      isAuthenticated: state.isAuthenticated,
+      firebaseId: action.firebaseId,
+      user: state.user,
+      userId: action.userId,
+      message: state.message,
+      messages: state.messages
+    }
+  },
   [ADD_USER]: (state, action) => {
     return {
+      isAuthenticated: state.isAuthenticated,
+      firebaseId: state.firebaseId,
       user: action.user,
+      userId: state.userId,
       message: state.message,
       messages: state.messages
     }
   },
   [HANDLE_CHANGE]: (state, action) => {
     return {
+      isAuthenticated: state.isAuthenticated,
+      firebaseId: state.firebaseId,
       user: state.user,
       message: action.message,
       messages: state.messages
@@ -69,6 +140,8 @@ const ACTION_HANDLERS = {
         time: new Date()
       }]
       return {
+        isAuthenticated: state.isAuthenticated,
+        firebaseId: state.firebaseId,
         user: state.user,
         message: '',
         messages
@@ -84,6 +157,8 @@ const ACTION_HANDLERS = {
         time: new Date()
       }]
       return {
+        isAuthenticated: state.isAuthenticated,
+        firebaseId: state.firebaseId,
         user: state.user,
         message: '',
         messages
@@ -97,11 +172,13 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  isAuthenticated: false,
+  firebaseId: null,
   user: '',
   message: '',
   messages: []
 }
-export default function testReducer (state = initialState, action) {
+export default function firebaseChatReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }
