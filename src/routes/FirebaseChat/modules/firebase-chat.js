@@ -16,9 +16,9 @@ export const checkAuthentication = (fireRef) => {
   return (dispatch, getState) => {
     return new Promise((resolve) => {
       fireRef.auth().onAuthStateChanged(firebase => {
-        let firebaseId = firebase.uid
-        if (firebaseId) {
+        if (firebase) {
           // Firebase Authenticated
+          let firebaseId = firebase.uid
           dispatch({
             type: IS_AUTHENTICATED,
             isAuthenticated: true,
@@ -171,7 +171,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  isAuthenticated: false,
+  isAuthenticated: null,
   firebaseId: null,
   user: '',
   message: '',
