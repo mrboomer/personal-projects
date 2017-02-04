@@ -35,7 +35,7 @@ export default class FirebaseChat extends Component {
     }
 
     // Load Chat History
-    if (this.props.chat.isAuthenticated === null && nextProps.chat.isAuthenticated === true) {
+    if (!this.props.chat.isAuthenticated && nextProps.chat.isAuthenticated) {
       this.props.loadMessages()
     }
   }
