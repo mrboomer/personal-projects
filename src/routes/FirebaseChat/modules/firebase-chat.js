@@ -12,24 +12,23 @@ export const AUTHENTICATE_FIREBASE = 'AUTHENTICATE_FIREBASE'
 // Actions
 // ------------------------------------
 
-export const checkAuthentication = (fireRef) => {
+export const checkAuthentication = (auth) => {
   return (dispatch, getState) => {
     return new Promise((resolve) => {
-      fireRef.auth().onAuthStateChanged(firebase => {
-        if (firebase) {
-          // Firebase Authenticated
-          let firebaseId = firebase.uid
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          let userId = user.uid
           dispatch({
             type: IS_AUTHENTICATED,
             isAuthenticated: true,
-            firebaseId
+            userId
           })
           resolve()
         } else {
           dispatch({
             type: IS_AUTHENTICATED,
             isAuthenticated: false,
-            firebaseId: null
+            userId: null
           })
           resolve()
         }
@@ -38,18 +37,18 @@ export const checkAuthentication = (fireRef) => {
   }
 }
 
-export const authenticateFirebase = (fireRef) => {
+export const authenticateFirebase = (auth) => {
   return (dispatch, getState) => {
-    fireRef.auth().signInAnonymously().then(firebase => {
-      let firebaseId = firebase.uid
+    auth.signInAnonymously().then(user => {
+      let userId = user.uid
       return dispatch({
         type: AUTHENTICATE_FIREBASE,
-        firebaseId
+        userId
       })
     }).catch(() => {
       return dispatch({
         type: AUTHENTICATE_FIREBASE,
-        firebaseId: null
+        userId: null
       })
     })
   }
@@ -95,9 +94,8 @@ const ACTION_HANDLERS = {
   [IS_AUTHENTICATED]: (state, action) => {
     return {
       isAuthenticated: action.isAuthenticated,
-      firebaseId: action.firebaseId,
-      user: state.user,
       userId: action.userId,
+      user: state.user,
       message: state.message,
       messages: state.messages
     }
@@ -105,9 +103,8 @@ const ACTION_HANDLERS = {
   [AUTHENTICATE_FIREBASE]: (state, action) => {
     return {
       isAuthenticated: state.isAuthenticated,
-      firebaseId: action.firebaseId,
-      user: state.user,
       userId: action.userId,
+      user: state.user,
       message: state.message,
       messages: state.messages
     }
@@ -115,9 +112,8 @@ const ACTION_HANDLERS = {
   [ADD_USER]: (state, action) => {
     return {
       isAuthenticated: state.isAuthenticated,
-      firebaseId: state.firebaseId,
-      user: action.user,
       userId: state.userId,
+      user: action.user,
       message: state.message,
       messages: state.messages
     }
@@ -125,7 +121,7 @@ const ACTION_HANDLERS = {
   [HANDLE_CHANGE]: (state, action) => {
     return {
       isAuthenticated: state.isAuthenticated,
-      firebaseId: state.firebaseId,
+      userId: state.userId,
       user: state.user,
       message: action.message,
       messages: state.messages
@@ -140,7 +136,7 @@ const ACTION_HANDLERS = {
       }]
       return {
         isAuthenticated: state.isAuthenticated,
-        firebaseId: state.firebaseId,
+        userId: state.userId,
         user: state.user,
         message: '',
         messages
@@ -157,7 +153,7 @@ const ACTION_HANDLERS = {
       }]
       return {
         isAuthenticated: state.isAuthenticated,
-        firebaseId: state.firebaseId,
+        userId: state.userId,
         user: state.user,
         message: '',
         messages
@@ -172,7 +168,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   isAuthenticated: null,
-  firebaseId: null,
+  userId: null,
   user: '',
   message: '',
   messages: []
