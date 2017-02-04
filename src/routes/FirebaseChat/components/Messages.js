@@ -10,7 +10,7 @@ export default class Messages extends Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    if (nextProps.messages === this.props.messages) {
+    if (this.props.messages === nextProps.messages) {
       return false
     }
     return true
@@ -22,7 +22,6 @@ export default class Messages extends Component {
   }
 
   render () {
-    let userImg = `https://api.adorable.io/avatars/40/${this.props.user}`
     return (
       <div className='messages-container'>
         <div className='holder'>
@@ -30,8 +29,8 @@ export default class Messages extends Component {
             <div className='divider' />
             <div className='day-messages'>
               {this.props.messages.map((message, index) =>
-                <Message key={index} timestamp={message.time}
-                  avatar={userImg} user={message.user} text={message.text} />
+                <Message key={index} timestamp={new Date(JSON.parse(message.time))}
+                  user={message.user} text={message.message} />
               )}
             </div>
           </div>

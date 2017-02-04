@@ -2,10 +2,10 @@ import { connect } from 'react-redux'
 import {
   checkAuthentication,
   authenticateFirebase,
+  loadMessages,
   addUser,
   handleChange,
-  handleKeyDown,
-  handleClick
+  handleSubmit
 } from '../modules/firebase-chat'
 import { auth, database } from '../helpers/FirebaseInit'
 
@@ -23,10 +23,10 @@ import FirebaseChat from '../components/FirebaseChat'
 const mapDispatchToProps = {
   checkAuthentication : () => checkAuthentication(auth),
   authenticateFirebase : () => authenticateFirebase(auth),
+  loadMessages : () => loadMessages(database),
   addUser : (user) => addUser(user),
   handleChange : (e) => handleChange(e.target.value),
-  handleKeyDown : (e) => handleKeyDown(e.key, database),
-  handleClick : () => handleClick(database)
+  handleSubmit : (e) => handleSubmit(database, e.type, e.key)
 }
 
 const mapStateToProps = (state) => ({

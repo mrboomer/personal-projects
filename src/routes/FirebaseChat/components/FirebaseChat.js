@@ -33,10 +33,15 @@ export default class FirebaseChat extends Component {
     if (this.props.chat.isAuthenticated === null && nextProps.chat.isAuthenticated === false) {
       this.props.authenticateFirebase()
     }
+
+    // Load Chat History
+    if (this.props.chat.isAuthenticated === null && nextProps.chat.isAuthenticated === true) {
+      this.props.loadMessages()
+    }
   }
 
   render () {
-    let user = this.props.chat.user ? `@${this.props.chat.user}` : ''
+    const user = this.props.chat.user ? `@${this.props.chat.user}` : ''
     return (
       <div className='firebase-chat' >
         <header className='chat-header'>
@@ -49,8 +54,8 @@ export default class FirebaseChat extends Component {
                 <input type='text' className='input is-medium is-expanded' placeholder='Message'
                   ref={(input) => { this.messageInput = input }}
                   onChange={this.props.handleChange} value={this.props.chat.message}
-                  onKeyDown={this.props.handleKeyDown} />
-                <a className='button is-medium is-info' onClick={this.props.handleClick} >
+                  onKeyDown={this.props.handleSubmit} />
+                <a className='button is-medium is-info' onClick={this.props.handleSubmit} >
                   Send
                 </a>
               </p>
@@ -67,8 +72,8 @@ FirebaseChat.propTypes = {
   chat : PropTypes.object.isRequired,
   checkAuthentication: PropTypes.func.isRequired,
   authenticateFirebase: PropTypes.func.isRequired,
+  loadMessages: PropTypes.func.isRequired,
   addUser: PropTypes.func.isRequired,
   handleChange : PropTypes.func.isRequired,
-  handleKeyDown : PropTypes.func.isRequired,
-  handleClick : PropTypes.func.isRequired
+  handleSubmit : PropTypes.func.isRequired
 }

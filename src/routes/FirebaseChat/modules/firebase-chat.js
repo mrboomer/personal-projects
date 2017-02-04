@@ -1,12 +1,12 @@
 // ------------------------------------
 // Constants
 // ------------------------------------
+export const IS_AUTHENTICATED = 'IS_AUTHENTICATED'
+export const AUTHENTICATE_USER = 'AUTHENTICATE_USER'
+export const LOAD_MESSAGES = 'LOAD_MESSAGES'
 export const ADD_USER = 'ADD_USER'
 export const HANDLE_CHANGE = 'HANDLE_CHANGE'
-export const HANDLE_KEYDOWN = 'HANDLE_KEYDOWN'
-export const HANDLE_CLICK = 'HANDLE_CLICK'
-export const IS_AUTHENTICATED = 'IS_AUTHENTICATED'
-export const AUTHENTICATE_FIREBASE = 'AUTHENTICATE_FIREBASE'
+export const HANDLE_SUBMIT = 'HANDLE_SUBMIT'
 
 // ------------------------------------
 // Actions
@@ -37,18 +37,35 @@ export const checkAuthentication = (auth) => {
   }
 }
 
-export const authenticateFirebase = (auth) => {
+export const authenticateUser = (auth) => {
   return (dispatch, getState) => {
     auth.signInAnonymously().then(user => {
       let userId = user.uid
       return dispatch({
-        type: AUTHENTICATE_FIREBASE,
+        type: AUTHENTICATE_USER,
         userId
       })
     }).catch(() => {
       return dispatch({
-        type: AUTHENTICATE_FIREBASE,
+        type: AUTHENTICATE_USER,
         userId: null
+      })
+    })
+  }
+}
+
+export const loadMessages = (database) => {
+  return (dispatch, getState) => {
+    return new Promise((resolve) => {
+      database.ref('messages/public').on('child_added', dbMessages => {
+        let messages = [
+          ...getState().chat.messages,
+          dbMessages.val()
+        ]
+        return dispatch({
+          type: LOAD_MESSAGES,
+          messages
+        })
       })
     })
   }
@@ -68,23 +85,34 @@ export const handleChange = (message) => {
   }
 }
 
-export const handleKeyDown = (key) => {
-  return {
-    type: HANDLE_KEYDOWN,
-    key
-  }
-}
-
-export const handleClick = () => {
-  return {
-    type: HANDLE_CLICK
+export const handleSubmit = (database, type, key) => {
+  return (dispatch, getState) => {
+    const onKeyEnter = type === 'keydown' && key === 'Enter' && getState().chat.message
+    const onClick = type === 'click' && getState().chat.message
+    if (onKeyEnter || onClick) {
+      const time = new Date()
+      database.ref('messages/public').push().set({
+        userId: getState().chat.userId,
+        user: getState().chat.user,
+        message: getState().chat.message,
+        time: JSON.stringify(time)
+      }).then(() => {
+        return dispatch({
+          type: HANDLE_SUBMIT,
+          time
+        })
+      })
+    }
   }
 }
 
 export const actions = {
+  checkAuthentication,
+  authenticateUser,
+  loadMessages,
+  addUser,
   handleChange,
-  handleKeyDown,
-  handleClick
+  handleSubmit
 }
 
 // ------------------------------------
@@ -100,13 +128,22 @@ const ACTION_HANDLERS = {
       messages: state.messages
     }
   },
-  [AUTHENTICATE_FIREBASE]: (state, action) => {
+  [AUTHENTICATE_USER]: (state, action) => {
     return {
       isAuthenticated: state.isAuthenticated,
       userId: action.userId,
       user: state.user,
       message: state.message,
       messages: state.messages
+    }
+  },
+  [LOAD_MESSAGES]: (state, action) => {
+    return {
+      isAuthenticated: state.isAuthenticated,
+      userId: state.userId,
+      user: state.user,
+      message: state.message,
+      messages: action.messages
     }
   },
   [ADD_USER]: (state, action) => {
@@ -127,30 +164,9 @@ const ACTION_HANDLERS = {
       messages: state.messages
     }
   },
-  [HANDLE_KEYDOWN]: (state, action) => {
-    if (action.key === 'Enter' && state.message) {
-      const messages = [...state.messages, {
-        user: state.user,
-        text: state.message,
-        time: new Date()
-      }]
-      return {
-        isAuthenticated: state.isAuthenticated,
-        userId: state.userId,
-        user: state.user,
-        message: '',
-        messages
-      }
-    }
-    return state
-  },
-  [HANDLE_CLICK]: (state, action) => {
+  [HANDLE_SUBMIT]: (state, action) => {
     if (state.message) {
-      const messages = [...state.messages, {
-        user: state.user,
-        text: state.message,
-        time: new Date()
-      }]
+      let messages = [...state.messages]
       return {
         isAuthenticated: state.isAuthenticated,
         userId: state.userId,

@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import './Message.scss'
 
 const Message = props => {
+  const userImg = `https://api.adorable.io/avatars/40/${props.user}`
   const timestamp = props.timestamp
 
   const hh = (timestamp.getHours() + 11) % 12 + 1
@@ -27,7 +28,7 @@ const Message = props => {
   return (
     <div className='message'>
       <div className='avatar'>
-        <img src={props.avatar} />
+        <img src={userImg} />
       </div>
       <div className='content'>
         <div className='details'>
@@ -43,8 +44,7 @@ const Message = props => {
 Message.propTypes = {
   timestamp: PropTypes.object.isRequired,
   user : PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-  avatar : PropTypes.string.isRequired
+  text: PropTypes.string.isRequired
 }
 
 export default Message
