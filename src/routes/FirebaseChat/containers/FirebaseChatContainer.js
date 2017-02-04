@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import {
   checkAuthentication,
-  authenticateFirebase,
+  authenticateUser,
   loadMessages,
   addUser,
   handleChange,
@@ -22,7 +22,7 @@ import FirebaseChat from '../components/FirebaseChat'
 
 const mapDispatchToProps = {
   checkAuthentication : () => checkAuthentication(auth),
-  authenticateFirebase : () => authenticateFirebase(auth),
+  authenticateUser : () => authenticateUser(auth),
   loadMessages : () => loadMessages(database),
   addUser : (user) => addUser(user),
   handleChange : (e) => handleChange(e.target.value),
