@@ -9,8 +9,8 @@ export default class FirebaseChat extends Component {
   }
 
   componentDidMount () {
-    let user = this.props.chat.user ? this.props.chat.user : prompt('What is your name?')
-    user = user === null ? `user${Math.floor(Math.random() * 9000) + 1000}` : user
+    let user = this.props.chat.user ? this.props.chat.user : prompt('Hello! What is your name?')
+    user = user === null || user === '' ? `user${Math.floor(Math.random() * 9000) + 1000}` : user
     this.props.addUser(user)
     this.messageInput.focus()
   }
@@ -30,6 +30,7 @@ export default class FirebaseChat extends Component {
   }
 
   componentWillUpdate (nextProps) {
+    // No Firebase Authentication Found
     if (this.props.chat.isAuthenticated === null && nextProps.chat.isAuthenticated === false) {
       this.props.authenticateUser()
     }
