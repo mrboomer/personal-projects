@@ -30,6 +30,11 @@ export default class FirebaseChat extends Component {
   }
 
   componentWillUpdate (nextProps) {
+    // Firebase Authentication Found
+    if (this.props.chat.isAuthenticated === null && nextProps.chat.isAuthenticated === true) {
+      // TODO: this.props.loadUser()
+    }
+
     // No Firebase Authentication Found
     if (this.props.chat.isAuthenticated === null && nextProps.chat.isAuthenticated === false) {
       this.props.authenticateUser()
@@ -74,6 +79,7 @@ FirebaseChat.propTypes = {
   checkAuthentication: PropTypes.func.isRequired,
   authenticateUser: PropTypes.func.isRequired,
   loadMessages: PropTypes.func.isRequired,
+  loadUser: PropTypes.func.isRequired,
   addUser: PropTypes.func.isRequired,
   handleChange : PropTypes.func.isRequired,
   handleSubmit : PropTypes.func.isRequired
