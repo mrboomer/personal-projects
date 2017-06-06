@@ -42,6 +42,7 @@ function firebaseChatReducer(state = initialState, action) {
         .set('authCheckError', action.error);
     case GET_NEW_USER_ID_SUCCESS:
       return state
+        .set('isAuthenticated', true)
         .set('userId', action.userId)
         .set('getUserIdError', null);
     case GET_NEW_USER_ID_FAILURE:

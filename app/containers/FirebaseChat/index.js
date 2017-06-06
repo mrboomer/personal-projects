@@ -18,18 +18,12 @@ import Messages from 'containers/FirebaseChatMessages';
 // Actions
 import { checkAuthentication, authenticateUser, getMessages, addUser, handleChange, processSubmit } from './actions';
 
-import { makeSelectIsAuthenticated, makeSelectUser, makeSelectMessage, makeSelectMessages } from './selectors';
+import { makeSelectIsAuthenticated, makeSelectUserId, makeSelectUser, makeSelectMessage, makeSelectMessages } from './selectors';
 import messages from './messages';
 
 export class FirebaseChat extends React.Component { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
-    this.props.checkAuthentication();
-  }
-
   componentDidMount() {
-    let user = this.props.user ? this.props.user : prompt('Hello! What is your name?'); // eslint-disable-line
-    user = user === null || user === '' ? `user${Math.floor(Math.random() * 9000) + 1000}` : user;
-    this.props.addUser(user);
+    this.props.checkAuthentication();
     this.messageInput.focus();
   }
 
@@ -39,29 +33,35 @@ export class FirebaseChat extends React.Component { // eslint-disable-line react
       return true;
     }
 
-    // Skip First Update Render
-    if (!this.props.isAuthenticated && !nextProps.isAuthenticated) {
-      return false;
-    }
-
     return true;
   }
 
   componentWillUpdate(nextProps) {
+    // No Firebase Authentication Found
+    if (this.props.isAuthenticated === null && nextProps.isAuthenticated === false) {
+      this.props.authenticateUser();
+    }
+
     // Firebase Authentication Found
     if (this.props.isAuthenticated === null && nextProps.isAuthenticated === true) {
       // TODO: this.props.loadUser()
     }
 
-    // No Firebase Authentication Found
-    if (this.props.isAuthenticated === null && nextProps.isAuthenticated === false) {
-      this.props.authenticateUser();
+    // User Authenticated
+    if (this.props.isAuthenticated === false && !this.props.userId && nextProps.userId) {
+      this.addUser();
     }
 
     // Load Chat History
     if (!this.props.isAuthenticated && nextProps.isAuthenticated) {
       this.props.loadMessages();
     }
+  }
+
+  addUser = () => {
+    let user = this.props.user ? this.props.user : prompt('Hello! What is your name?'); // eslint-disable-line
+    user = user === null || user === '' ? `user${Math.floor(Math.random() * 9000) + 1000}` : user;
+    this.props.addUser(user);
   }
 
   handleSubmit = (e) => {
@@ -115,6 +115,7 @@ FirebaseChat.propTypes = {
     PropTypes.array,
   ]),
   isAuthenticated: PropTypes.bool,
+  userId: PropTypes.string,
   checkAuthentication: PropTypes.func.isRequired,
   authenticateUser: PropTypes.func.isRequired,
   loadMessages: PropTypes.func.isRequired,
@@ -126,6 +127,7 @@ FirebaseChat.propTypes = {
 
 const mapStateToProps = createStructuredSelector({
   isAuthenticated: makeSelectIsAuthenticated(),
+  userId: makeSelectUserId(),
   user: makeSelectUser(),
   message: makeSelectMessage(),
   messages: makeSelectMessages(),

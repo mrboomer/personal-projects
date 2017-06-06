@@ -1,16 +1,17 @@
 import * as firebase from 'firebase';
+import config from '../../config';
 
 // Initialize Firebase
-const config = {
-  apiKey: 'AIzaSyAik25zvy6K6THu41L6X5TQszEcndziTHM',
-  authDomain: 'daniel-escobedo.firebaseapp.com',
-  databaseURL: 'https://daniel-escobedo.firebaseio.com',
-  projectId: 'daniel-escobedo',
-  storageBucket: 'daniel-escobedo.appspot.com',
-  messagingSenderId: '762731445141',
+const fbConfig = {
+  apiKey: config.FIREBASE.API_KEY,
+  authDomain: config.FIREBASE.AUTH_DOMAIN,
+  databaseURL: config.FIREBASE.DATABASE_URL,
+  projectId: config.FIREBASE.PROJECT_ID,
+  storageBucket: config.FIREBASE.STORAGE_BUCKET,
+  messagingSenderId: config.FIREBASE.MESSAGING_SENDER_ID,
 };
 
-firebase.initializeApp(config);
+firebase.initializeApp(fbConfig);
 
 export const auth = firebase.auth();
 
