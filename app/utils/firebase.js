@@ -21,11 +21,11 @@ export function getNewUserId() {
 
 export function getMessagesFromDb() {
   return new Promise((resolve) => {
-    const messages = [];
-    database.ref('messages/public').on('child_added', (dbMessages) => {
-      messages.push(dbMessages.val());
-    })
-    .then(resolve(messages));
+    database.ref('messages/public').once('value')
+    .then((snapshot) => {
+      const messages = Object.values(snapshot.val());
+      resolve(messages);
+    });
   });
 }
 
