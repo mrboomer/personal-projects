@@ -30,7 +30,7 @@ const makeSelectMessage = () => createSelector(
 
 const makeSelectMessages = () => createSelector(
   selectFirebaseChatDomain(),
-  (substate) => substate.get('messages')
+  (substate) => substate.get('messages').toJS()
 );
 
 const makeSelectAuthCheckError = () => createSelector(

@@ -10,8 +10,8 @@ import {
   CHECK_AUTHENTICATION_FAILURE,
   GET_NEW_USER_ID_SUCCESS,
   GET_NEW_USER_ID_FAILURE,
-  GET_MESSAGES_SUCCESS,
-  GET_MESSAGES_FAILURE,
+  GET_MESSAGE_SUCCESS,
+  GET_MESSAGE_FAILURE,
   ADD_USER,
   HANDLE_CHANGE,
   PROCESS_SUBMIT_SUCCESS,
@@ -48,10 +48,10 @@ function firebaseChatReducer(state = initialState, action) {
     case GET_NEW_USER_ID_FAILURE:
       return state
         .set('getUserIdError', action.error);
-    case GET_MESSAGES_SUCCESS:
+    case GET_MESSAGE_SUCCESS:
       return state
-        .set('messages', action.messages);
-    case GET_MESSAGES_FAILURE:
+        .set('messages', state.get('messages').push(action.message));
+    case GET_MESSAGE_FAILURE:
       return state
         .set('getMessagesError', action.error);
     case ADD_USER:

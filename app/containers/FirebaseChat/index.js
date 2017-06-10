@@ -77,7 +77,6 @@ export class FirebaseChat extends React.Component { // eslint-disable-line react
   render() {
     const user = this.props.user ? `@${this.props.user}` : '';
     const buttonSend = <FormattedMessage {...messages.buttonSend} />;
-    const chatMessages = this.props.messages instanceof Array ? this.props.messages : [];
 
     return (
       <StyledFirebaseChat>
@@ -99,7 +98,7 @@ export class FirebaseChat extends React.Component { // eslint-disable-line react
                 </button>
               </p>
             </div>
-            <Messages user={this.props.user} messages={chatMessages} />
+            <Messages user={this.props.user} messages={this.props.messages} />
           </div>
         </div>
       </StyledFirebaseChat>

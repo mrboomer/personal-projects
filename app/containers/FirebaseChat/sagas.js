@@ -1,11 +1,13 @@
 import moment from 'moment';
+import { eventChannel } from 'redux-saga';
 import { take, call, put, select, cancel, takeLatest } from 'redux-saga/effects';
 import { makeSelectUserId, makeSelectUser, makeSelectMessage } from 'containers/FirebaseChat/selectors';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { CHECK_AUTHENTICATION_REQUEST, GET_NEW_USER_ID_REQUEST, GET_MESSAGES_REQUEST, PROCESS_SUBMIT_REQUEST } from 'containers/FirebaseChat/constants';
 import { checkAuthentication, authenticateUser, getMessages, processSubmit } from 'containers/FirebaseChat/actions';
 
-import { checkAuth, getNewUserId, getMessagesFromDb, saveMessage } from 'utils/firebase';
+import { checkAuth, getNewUserId, saveMessage } from 'utils/firebase';
+import { database } from 'helpers/firebase';
 
 export function* authenticationCheck() {
   try {
@@ -21,7 +23,7 @@ export function* authenticationCheck() {
   }
 }
 
-export function* takeLatestAuthenticationCheck() {
+function* takeLatestAuthenticationCheck() {
   const watcher = yield takeLatest(CHECK_AUTHENTICATION_REQUEST, authenticationCheck);
 
   // Suspend execution until location changes
@@ -29,7 +31,7 @@ export function* takeLatestAuthenticationCheck() {
   yield cancel(watcher);
 }
 
-export function* userIdRequest() {
+function* userIdRequest() {
   try {
     const newUserId = yield call(getNewUserId);
 
@@ -43,7 +45,7 @@ export function* userIdRequest() {
   }
 }
 
-export function* takeLatestUserIdRequest() {
+function* takeLatestUserIdRequest() {
   const watcher = yield takeLatest(GET_NEW_USER_ID_REQUEST, userIdRequest);
 
   // Suspend execution until location changes
@@ -51,25 +53,37 @@ export function* takeLatestUserIdRequest() {
   yield cancel(watcher);
 }
 
-export function* getUserMessages() {
-  try {
-    const dbMessages = yield call(getMessagesFromDb);
+function userMessagesChannel() {
+  return eventChannel((emit) => {
+    database.ref('messages/public').on('child_added', (messages) => {
+      emit(messages.val());
+    });
+    return () => false; // TODO: Add componentWillUnmount() to fix this unsubscribe function
+  });
+}
 
-    yield put(getMessages.success(dbMessages));
+function* loadUserMessage() {
+  const chan = yield call(userMessagesChannel);
+  try {
+    while (true) {
+      const message = yield take(chan);
+      yield put(getMessages.success(message));
+    }
   } catch (error) {
     yield put(getMessages.failure(error));
   }
 }
 
-export function* takeLatestGetUserMessages() {
-  const watcher = yield takeLatest(GET_MESSAGES_REQUEST, getUserMessages);
+function* takeLatestLoadUserMessage() {
+  const watcher = yield takeLatest(GET_MESSAGES_REQUEST, loadUserMessage);
 
   // Suspend execution until location changes
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
 
-export function* messageSubmit() {
+
+function* messageSubmit() {
   try {
     const timestamp = moment().format();
     const userId = yield select(makeSelectUserId());
@@ -83,7 +97,7 @@ export function* messageSubmit() {
   }
 }
 
-export function* takeLatestMessageSubmit() {
+function* takeLatestMessageSubmit() {
   const watcher = yield takeLatest(PROCESS_SUBMIT_REQUEST, messageSubmit);
 
   // Suspend execution until location changes
@@ -95,6 +109,6 @@ export function* takeLatestMessageSubmit() {
 export default [
   takeLatestAuthenticationCheck,
   takeLatestUserIdRequest,
-  takeLatestGetUserMessages,
+  takeLatestLoadUserMessage,
   takeLatestMessageSubmit,
 ];

@@ -13,8 +13,8 @@ export const GET_NEW_USER_ID_SUCCESS = 'app/FirebaseChat/GET_NEW_USER_ID_SUCCESS
 export const GET_NEW_USER_ID_FAILURE = 'app/FirebaseChat/GET_NEW_USER_ID_FAILURE';
 
 export const GET_MESSAGES_REQUEST = 'app/FirebaseChat/GET_MESSAGES_REQUEST';
-export const GET_MESSAGES_SUCCESS = 'app/FirebaseChat/GET_MESSAGES_SUCCESS';
-export const GET_MESSAGES_FAILURE = 'app/FirebaseChat/GET_MESSAGES_FAILURE';
+export const GET_MESSAGE_SUCCESS = 'app/FirebaseChat/GET_MESSAGE_SUCCESS';
+export const GET_MESSAGE_FAILURE = 'app/FirebaseChat/GET_MESSAGE_FAILURE';
 
 export const ADD_USER = 'app/FirebaseChat/ADD_USER';
 export const HANDLE_CHANGE = 'app/FirebaseChat/HANDLE_CHANGE';

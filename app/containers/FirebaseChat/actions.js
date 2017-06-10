@@ -12,8 +12,8 @@ import {
   GET_NEW_USER_ID_SUCCESS,
   GET_NEW_USER_ID_FAILURE,
   GET_MESSAGES_REQUEST,
-  GET_MESSAGES_SUCCESS,
-  GET_MESSAGES_FAILURE,
+  GET_MESSAGE_SUCCESS,
+  GET_MESSAGE_FAILURE,
   ADD_USER,
   HANDLE_CHANGE,
   PROCESS_SUBMIT_REQUEST,
@@ -54,12 +54,12 @@ const getMessages = {
   request: () => ({
     type: GET_MESSAGES_REQUEST,
   }),
-  success: (messages) => ({
-    type: GET_MESSAGES_SUCCESS,
-    messages,
+  success: (message) => ({
+    type: GET_MESSAGE_SUCCESS,
+    message,
   }),
   failure: (error) => ({
-    type: GET_MESSAGES_FAILURE,
+    type: GET_MESSAGE_FAILURE,
     error,
   }),
 };
