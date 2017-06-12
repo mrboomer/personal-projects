@@ -109,10 +109,7 @@ export class FirebaseChat extends React.Component { // eslint-disable-line react
 FirebaseChat.propTypes = {
   user: PropTypes.string,
   message: PropTypes.string,
-  messages: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.array,
-  ]),
+  messages: PropTypes.array,
   isAuthenticated: PropTypes.bool,
   userId: PropTypes.string,
   checkAuthentication: PropTypes.func.isRequired,
