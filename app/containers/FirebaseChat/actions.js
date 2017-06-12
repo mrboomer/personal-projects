@@ -11,10 +11,13 @@ import {
   GET_NEW_USER_ID_REQUEST,
   GET_NEW_USER_ID_SUCCESS,
   GET_NEW_USER_ID_FAILURE,
-  GET_MESSAGES_REQUEST,
+  START_MESSAGE_LISTENER,
+  STOP_MESSAGE_LISTENER,
   GET_MESSAGE_SUCCESS,
   GET_MESSAGE_FAILURE,
-  ADD_USER,
+  ADD_USER_REQUEST,
+  ADD_USER_SUCCESS,
+  ADD_USER_FAILURE,
   HANDLE_CHANGE,
   PROCESS_SUBMIT_REQUEST,
   PROCESS_SUBMIT_SUCCESS,
@@ -25,10 +28,11 @@ const checkAuthentication = {
   request: () => ({
     type: CHECK_AUTHENTICATION_REQUEST,
   }),
-  success: (isAuthenticated, userId) => ({
+  success: (isAuthenticated, userId, user) => ({
     type: CHECK_AUTHENTICATION_SUCCESS,
     isAuthenticated,
     userId,
+    user,
   }),
   failure: (error) => ({
     type: CHECK_AUTHENTICATION_FAILURE,
@@ -51,8 +55,11 @@ const authenticateUser = {
 };
 
 const getMessages = {
-  request: () => ({
-    type: GET_MESSAGES_REQUEST,
+  start: () => ({
+    type: START_MESSAGE_LISTENER,
+  }),
+  stop: () => ({
+    type: STOP_MESSAGE_LISTENER,
   }),
   success: (message) => ({
     type: GET_MESSAGE_SUCCESS,
@@ -64,10 +71,20 @@ const getMessages = {
   }),
 };
 
-const addUser = (user) => ({
-  type: ADD_USER,
-  user,
-});
+const addUser = {
+  request: (user) => ({
+    type: ADD_USER_REQUEST,
+    user,
+  }),
+  success: (user) => ({
+    type: ADD_USER_SUCCESS,
+    user,
+  }),
+  failure: (error) => ({
+    type: ADD_USER_FAILURE,
+    error,
+  }),
+};
 
 const handleChange = (message) => ({
   type: HANDLE_CHANGE,

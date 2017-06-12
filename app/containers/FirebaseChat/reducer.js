@@ -4,15 +4,16 @@
  *
  */
 
-import { fromJS } from 'immutable';
+import { fromJS, List } from 'immutable';
 import {
   CHECK_AUTHENTICATION_SUCCESS,
   CHECK_AUTHENTICATION_FAILURE,
   GET_NEW_USER_ID_SUCCESS,
   GET_NEW_USER_ID_FAILURE,
+  STOP_MESSAGE_LISTENER,
   GET_MESSAGE_SUCCESS,
   GET_MESSAGE_FAILURE,
-  ADD_USER,
+  ADD_USER_SUCCESS,
   HANDLE_CHANGE,
   PROCESS_SUBMIT_SUCCESS,
   PROCESS_SUBMIT_FAILURE,
@@ -36,6 +37,7 @@ function firebaseChatReducer(state = initialState, action) {
       return state
         .set('isAuthenticated', action.isAuthenticated)
         .set('userId', action.userId)
+        .set('user', action.user)
         .set('authCheckError', null);
     case CHECK_AUTHENTICATION_FAILURE:
       return state
@@ -48,13 +50,19 @@ function firebaseChatReducer(state = initialState, action) {
     case GET_NEW_USER_ID_FAILURE:
       return state
         .set('getUserIdError', action.error);
+    case STOP_MESSAGE_LISTENER:
+      return state
+        .set('isAuthenticated', null)
+        .set('userId', null)
+        .set('user', '')
+        .set('messages', List());
     case GET_MESSAGE_SUCCESS:
       return state
         .set('messages', state.get('messages').push(action.message));
     case GET_MESSAGE_FAILURE:
       return state
         .set('getMessagesError', action.error);
-    case ADD_USER:
+    case ADD_USER_SUCCESS:
       return state
         .set('user', action.user);
     case HANDLE_CHANGE:

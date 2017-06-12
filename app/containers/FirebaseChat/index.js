@@ -42,20 +42,19 @@ export class FirebaseChat extends React.Component { // eslint-disable-line react
       this.props.authenticateUser();
     }
 
-    // Firebase Authentication Found
-    if (this.props.isAuthenticated === null && nextProps.isAuthenticated === true) {
-      // TODO: this.props.loadUser()
-    }
-
     // User Authenticated
     if (this.props.isAuthenticated === false && !this.props.userId && nextProps.userId) {
       this.addUser();
     }
 
-    // Load Chat History
+    // Start Message Listener
     if (!this.props.isAuthenticated && nextProps.isAuthenticated) {
-      this.props.loadMessages();
+      this.props.startMessageListener();
     }
+  }
+
+  componentWillUnmount() {
+    this.props.stopMessageListener();
   }
 
   addUser = () => {
@@ -114,8 +113,8 @@ FirebaseChat.propTypes = {
   userId: PropTypes.string,
   checkAuthentication: PropTypes.func.isRequired,
   authenticateUser: PropTypes.func.isRequired,
-  loadMessages: PropTypes.func.isRequired,
-  // loadUser: PropTypes.func.isRequired,
+  startMessageListener: PropTypes.func.isRequired,
+  stopMessageListener: PropTypes.func.isRequired,
   addUser: PropTypes.func.isRequired,
   handleChange: PropTypes.func.isRequired,
   processSubmit: PropTypes.func.isRequired,
@@ -133,8 +132,9 @@ function mapDispatchToProps(dispatch) {
   return {
     checkAuthentication: () => dispatch(checkAuthentication.request()),
     authenticateUser: () => dispatch(authenticateUser.request()),
-    loadMessages: () => dispatch(getMessages.request()),
-    addUser: (user) => dispatch(addUser(user)),
+    startMessageListener: () => dispatch(getMessages.start()),
+    stopMessageListener: () => dispatch(getMessages.stop()),
+    addUser: (user) => dispatch(addUser.request(user)),
     handleChange: (e) => dispatch(handleChange(e.target.value)),
     processSubmit: () => dispatch(processSubmit.request()),
   };

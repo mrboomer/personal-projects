@@ -12,6 +12,24 @@ export function checkAuth() {
   });
 }
 
+export function saveUser(userId, user) {
+  return new Promise((resolve) => {
+    database.ref(`users/${userId}`).set({
+      user,
+    })
+    .then(resolve);
+  });
+}
+
+export function getUserName(userId) {
+  return new Promise((resolve) => {
+    database.ref(`users/${userId}`).once('value').then((snapshot) => {
+      const userName = snapshot.val().user;
+      resolve(userName);
+    });
+  });
+}
+
 export function getNewUserId() {
   return new Promise((resolve) => {
     auth.signInAnonymously()

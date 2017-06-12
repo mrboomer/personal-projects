@@ -1,22 +1,33 @@
 import moment from 'moment';
 import { eventChannel } from 'redux-saga';
-import { take, call, put, select, cancel, takeLatest } from 'redux-saga/effects';
+import { take, call, fork, put, select, cancel, cancelled, takeLatest } from 'redux-saga/effects';
 import { makeSelectUserId, makeSelectUser, makeSelectMessage } from 'containers/FirebaseChat/selectors';
-import { LOCATION_CHANGE } from 'react-router-redux';
-import { CHECK_AUTHENTICATION_REQUEST, GET_NEW_USER_ID_REQUEST, GET_MESSAGES_REQUEST, PROCESS_SUBMIT_REQUEST } from 'containers/FirebaseChat/constants';
-import { checkAuthentication, authenticateUser, getMessages, processSubmit } from 'containers/FirebaseChat/actions';
 
-import { checkAuth, getNewUserId, saveMessage } from 'utils/firebase';
+import { LOCATION_CHANGE } from 'react-router-redux';
+import {
+  CHECK_AUTHENTICATION_REQUEST,
+  GET_NEW_USER_ID_REQUEST,
+  ADD_USER_REQUEST,
+  START_MESSAGE_LISTENER,
+  STOP_MESSAGE_LISTENER,
+  PROCESS_SUBMIT_REQUEST,
+} from 'containers/FirebaseChat/constants';
+
+import { checkAuthentication, authenticateUser, addUser, getMessages, processSubmit } from 'containers/FirebaseChat/actions';
+
+import { checkAuth, getNewUserId, saveUser, getUserName, saveMessage } from 'utils/firebase';
 import { database } from 'helpers/firebase';
+
 
 export function* authenticationCheck() {
   try {
     const userId = yield call(checkAuth);
 
     if (userId) {
-      yield put(checkAuthentication.success(true, userId));
+      const user = yield call(getUserName, userId);
+      yield put(checkAuthentication.success(true, userId, user));
     } else {
-      yield put(checkAuthentication.success(false, userId));
+      yield put(checkAuthentication.success(false, userId, ''));
     }
   } catch (error) {
     yield put(checkAuthentication.failure(error));
@@ -25,21 +36,15 @@ export function* authenticationCheck() {
 
 function* takeLatestAuthenticationCheck() {
   const watcher = yield takeLatest(CHECK_AUTHENTICATION_REQUEST, authenticationCheck);
-
-  // Suspend execution until location changes
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
 
+
 function* userIdRequest() {
   try {
     const newUserId = yield call(getNewUserId);
-
-    if (newUserId) {
-      yield put(authenticateUser.success(newUserId));
-    } else {
-      yield put(authenticateUser.success(newUserId));
-    }
+    yield put(authenticateUser.success(newUserId));
   } catch (error) {
     yield put(authenticateUser.failure(error));
   }
@@ -47,23 +52,41 @@ function* userIdRequest() {
 
 function* takeLatestUserIdRequest() {
   const watcher = yield takeLatest(GET_NEW_USER_ID_REQUEST, userIdRequest);
-
-  // Suspend execution until location changes
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
 
-function userMessagesChannel() {
+
+function* addUserRequest(action) {
+  try {
+    const user = action.user;
+    const userId = yield select(makeSelectUserId());
+    yield call(saveUser, userId, user);
+    yield put(addUser.success(user));
+  } catch (error) {
+    yield put(addUser.failure(error));
+  }
+}
+
+function* takeLatestAddUserRequest() {
+  const watcher = yield takeLatest(ADD_USER_REQUEST, addUserRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
+
+function messagesChannel() {
   return eventChannel((emit) => {
-    database.ref('messages/public').on('child_added', (messages) => {
+    const ref = database.ref('messages/public');
+    ref.on('child_added', (messages) => {
       emit(messages.val());
     });
-    return () => false; // TODO: Add componentWillUnmount() to fix this unsubscribe function
+    return () => ref.off('child_added');
   });
 }
 
-function* loadUserMessage() {
-  const chan = yield call(userMessagesChannel);
+function* loadMessages() {
+  const chan = yield call(messagesChannel);
   try {
     while (true) {
       const message = yield take(chan);
@@ -71,14 +94,24 @@ function* loadUserMessage() {
     }
   } catch (error) {
     yield put(getMessages.failure(error));
+  } finally {
+    if (yield cancelled()) {
+      chan.close();
+    }
   }
 }
 
-function* takeLatestLoadUserMessage() {
-  const watcher = yield takeLatest(GET_MESSAGES_REQUEST, loadUserMessage);
+function* startMessageListener() {
+  while (true) {
+    const loadMessagesTask = yield fork(loadMessages);
+    yield take(STOP_MESSAGE_LISTENER);
+    yield cancel(loadMessagesTask);
+  }
+}
 
-  // Suspend execution until location changes
-  yield take(LOCATION_CHANGE);
+function* takeLatestMessageListener() {
+  const watcher = yield takeLatest(START_MESSAGE_LISTENER, startMessageListener);
+  yield take(STOP_MESSAGE_LISTENER);
   yield cancel(watcher);
 }
 
@@ -89,7 +122,6 @@ function* messageSubmit() {
     const userId = yield select(makeSelectUserId());
     const user = yield select(makeSelectUser());
     const message = yield select(makeSelectMessage());
-
     yield call(saveMessage, userId, user, message, timestamp);
     yield put(processSubmit.success());
   } catch (error) {
@@ -99,16 +131,16 @@ function* messageSubmit() {
 
 function* takeLatestMessageSubmit() {
   const watcher = yield takeLatest(PROCESS_SUBMIT_REQUEST, messageSubmit);
-
-  // Suspend execution until location changes
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
+
 
 // All sagas to be loaded
 export default [
   takeLatestAuthenticationCheck,
   takeLatestUserIdRequest,
-  takeLatestLoadUserMessage,
+  takeLatestAddUserRequest,
+  takeLatestMessageListener,
   takeLatestMessageSubmit,
 ];
