@@ -14,7 +14,7 @@ export class FirebaseChatMessage extends React.PureComponent { // eslint-disable
   render() {
     const userImg = `https://api.adorable.io/avatars/40/${this.props.user}`;
     const date = moment(this.props.timestamp).format('MM-DD-YYYY');
-    const time = moment(this.props.timestamp).format('hh:mma');
+    const time = moment(this.props.timestamp).format('h:mma');
 
     return (
       <StyledMessage className="message">

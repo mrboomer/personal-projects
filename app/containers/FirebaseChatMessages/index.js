@@ -5,7 +5,6 @@
  */
 
 import React, { PropTypes } from 'react';
-import moment from 'moment';
 
 // Styled Components
 import StyledMessages from 'containers/FirebaseChatMessages/StyledMessages';
@@ -32,10 +31,9 @@ export class FirebaseChatMessages extends React.Component { // eslint-disable-li
   }
 
   render() {
-    const timestamp = moment().format();
     const messages = this.props.messages.map((message, index) =>
       <Message
-        key={index} timestamp={timestamp}
+        key={index} timestamp={message.timestamp}
         user={message.user} text={message.message}
       />
     );
